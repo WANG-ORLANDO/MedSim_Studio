@@ -56,20 +56,21 @@ coverage/
 htmlcov/
 .pytest_cache/
 
-# Model weights (large binary files, not tracked in git)
+# Model weights (large binary files)
 *.pth
 *.pt
 *.nii.gz
+*.onnx
 
-# TotalSegmentator pretrained weights (~2GB) — auto-downloaded
+# Model directories (not tracked in git)
 models/totalsegmentator/
-
-# Custom nnUNet model weights (large binary files, not tracked in git)
+models/nnunet701_full_handoff/
 models/nnunet702_handoff/
 models/nnunet702_organs20_teammate_handoff/
-
-# Phantom atlas data (real CT volumes for demo, not tracked in git)
 models/phantom_atlas/
+models/artifact_classifier/
+models/artifact_restorer/
+models/classifier/
 
 # Claude Code project settings
 .claude/

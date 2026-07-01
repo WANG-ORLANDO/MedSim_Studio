@@ -3,6 +3,7 @@ node_modules/
 .gitignore
 .env
 .env.local
+.env.*.local
 *.md
 .vscode/
 .idea/
@@ -19,5 +20,17 @@ datasets/
 *.db
 pip_cache/
 *.whl
+
+# Model weights (large files, mount via volumes)
+*.pth
+*.pt
+*.nii.gz
+*.onnx
+models/totalsegmentator/
+models/nnunet*/
+models/phantom_atlas/
+models/artifact_classifier/
+models/artifact_restorer/
+models/classifier/
 
 backend/export_test/
