@@ -1,0 +1,71 @@
+# ============================================================
+# CT Simulator - Backend Dependencies
+# ============================================================
+# Web Framework
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# DICOM Processing
+pydicom>=3.0.1
+pynetdicom>=2.0.2
+highdicom>=0.23.1
+
+# Medical Imaging
+SimpleITK>=2.3.1
+nibabel>=5.2.0
+
+# Scientific Computing
+numpy>=1.26.2
+scipy>=1.11.4
+
+# Image generation for previews
+Pillow>=10.0.0
+
+# Visualization Toolkit
+vtk>=9.3.0
+
+# Database
+sqlalchemy>=2.0.23
+asyncpg>=0.29.0
+psycopg2-binary>=2.9.9
+alembic>=1.13.0
+
+# Object Storage
+minio>=7.2.3
+
+# AI/ML
+# torch is installed separately in Dockerfile (CPU-only build)
+monai>=1.3.0
+TotalSegmentator>=2.0.0
+
+# Validation
+pydantic>=2.5.3
+pydantic-settings>=2.1.0
+email-validator>=2.1.0
+
+# Auth
+python-jose[cryptography]>=3.3.0
+cryptography>=41.0.7
+passlib[bcrypt]>=1.7.4
+
+# Utils
+python-dotenv>=1.0.0
+orjson>=3.9.10
+filetype>=1.2.0
+
+# Async
+httpx>=0.25.2
+aiofiles>=23.2.1
+
+# Testing
+pytest>=7.4.3
+pytest-asyncio>=0.23.2
+
+# B组 - 伪影处理
+scikit-image>=0.22.0        # Radon/iRadon 变换、图像处理
+torch>=2.1.0                # 深度学习框架
+torchvision>=0.16.0         # 预训练模型 + 数据增强
+timm>=0.9.0                 # 预训练 ViT/CNN 模型库
+albumentations>=1.4.0       # 图像数据增强
+monai>=1.3.0                # 医学影像 AI（复用A组已有）

@@ -1,0 +1,17 @@
+{
+    "channel_names": {
+        "0": "CT"
+    },
+    "labels": {
+        "background": 0,
+        "liver": 1,
+        "kidney": 2,
+        "lung": 3,
+        "spleen": 4,
+        "pancreas": 5,
+        "bladder": 6
+    },
+    "numTraining": 1202,
+    "file_ending": ".nii.gz",
+    "name": "TotalSegOrgans6"
+}

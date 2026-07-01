@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+poetry.lock
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter
+.ipynb_checkpoints
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Model weights (large binary files, not tracked in git)
+*.pth
+*.pt
+*.nii.gz
+
+# TotalSegmentator pretrained weights (~2GB) — auto-downloaded
+models/totalsegmentator/
+
+# Custom nnUNet model weights (large binary files, not tracked in git)
+models/nnunet702_handoff/
+models/nnunet702_organs20_teammate_handoff/
+
+# Phantom atlas data (real CT volumes for demo, not tracked in git)
+models/phantom_atlas/
+
+# Claude Code project settings
+.claude/
+
+# DICOM
+datasets/dicom/raw/*
+datasets/annotations/*
+!datasets/dicom/raw/.gitkeep
+!datasets/annotations/.gitkeep
+
+# MinIO data
+docker/data/
+
+# Uploads
+uploads/
+
+# Pre-downloaded pip wheels for Docker builds
+pip_cache/
+downloads/
+*.db
+
+backend/export_test/

@@ -1,0 +1,155 @@
+# ============================================================
+# CT Simulator - Docker Compose Configuration
+# ============================================================
+# Orchestrates all services: frontend, backend, postgres, minio
+#
+# Quick start:
+#   docker-compose up -d
+#
+# Access:
+#   - Frontend: http://localhost:3000
+#   - Backend API: http://localhost:8000
+#   - Swagger Docs: http://localhost:8000/docs
+#   - MinIO Console: http://localhost:9001
+# ============================================================
+
+services:
+  # ---- Frontend (React + Vite) ----
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: ct-frontend
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - ct-network
+    restart: unless-stopped
+
+  # ---- Backend (FastAPI) ----
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: ct-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - BACKEND_DEBUG=false
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ct_simulator
+      - POSTGRES_USER=ctuser
+      - POSTGRES_PASSWORD=ctpass123
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_BUCKET=dicom-studies
+      - DATABASE_URL=postgresql://ctuser:ctpass123@postgres:5432/ct_simulator
+      - LOG_LEVEL=INFO
+      - AI_DEVICE=cpu
+      - AI_MODEL_PATH=/app/custom-models
+      - CLASSIFIER_MODEL_PATH=/tmp/clf_full/best_model.pth
+      # TotalSegmentator weights — mounted to a separate path to avoid
+      # conflicting with the backend_models named volume at /app/ai-models
+      - TOTALSEGMENTATOR_DIR=/app/models/totalsegmentator
+      # TOTALSEGMENTATOR_FAST: true = 3mm fast model, false = 1.5mm full model (5 models, higher accuracy, slower)
+      - TOTALSEGMENTATOR_FAST=false
+      # Atlas phantom root — so the backend can find models/phantom_atlas/
+      - MEDSIM_PROJECT_ROOT=/app
+    volumes:
+      - backend_uploads:/tmp/uploads
+      - backend_models:/app/ai-models
+      - backend_dicom:/app/static/dicom
+      # Mount local pretrained TotalSegmentator weights (avoid ~2 GB re-download)
+      - ./models/totalsegmentator:/app/models/totalsegmentator
+      # Mount custom-trained nnUNet model (Dataset701_TotalSegOrgans6, 6 organs)
+      - ./models/nnunet701_full_handoff/nnunet_handoff/model/Dataset701_TotalSegOrgans6/nnUNetTrainer__nnUNetPlans__3d_fullres:/app/models/nnunet_handoff
+      # Mount custom-trained nnUNet 20-class model (Dataset702_TotalSegOrgans20)
+      - ./models/nnunet702_handoff:/app/models/nnunet702_handoff
+      # Mount phantom atlas data (real CT volumes for demo, not tracked in git)
+      - ./models/phantom_atlas:/app/models/phantom_atlas
+      # Mount classifier model weights
+      - ./models/classifier:/app/models/classifier
+    # TotalSegmentator uses PyTorch DataLoader multiprocessing workers
+    # which require large /dev/shm for inter-process communication.
+    # Default 64MB is far too small; allocate 8GB.
+    shm_size: 8g
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - ct-network
+    restart: unless-stopped
+
+  # ---- PostgreSQL ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: ct-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=ct_simulator
+      - POSTGRES_USER=ctuser
+      - POSTGRES_PASSWORD=ctpass123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ctuser -d ct_simulator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ct-network
+    restart: unless-stopped
+
+  # ---- MinIO (S3-compatible object storage) ----
+  minio:
+    image: minio/minio:latest
+    container_name: ct-minio
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    environment:
+      - AI_MONAI_ENABLED=true
+      - AI_DEVICE=cpu
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - ct-network
+    restart: unless-stopped
+
+networks:
+  ct-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  backend_uploads:
+    driver: local
+  backend_models:
+    driver: local
+  backend_dicom:
+    driver: local
