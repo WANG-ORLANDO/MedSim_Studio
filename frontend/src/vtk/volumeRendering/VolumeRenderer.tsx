@@ -660,7 +660,7 @@ export function VolumeRenderer({
       mapper.addClippingPlane(plane);
     }
     renderWindow.render();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [clip, syntheticClipIndex, syntheticScanAxis, isReady]);
 
   // ------------------------------------------------------------------

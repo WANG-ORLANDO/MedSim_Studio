@@ -319,8 +319,8 @@ export async function loadDicomVolume(
   }
 
   // 6. Compute origin (first slice's imagePositionPatient, or zero)
-  let originX = 0.0;
-  let originY = 0.0;
+  const originX = 0.0;
+  const originY = 0.0;
   let originZ = 0.0;
   if (first.imagePositionZ !== null) {
     // We only stored Z — fetch full IPP from a re-parse isn't worth it.

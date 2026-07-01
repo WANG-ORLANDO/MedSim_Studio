@@ -200,7 +200,7 @@ function TrainTab() {
       setStatus(s);
       if (s.status === 'training' || s.status === 'starting') { if (s.startTime) setStartTime(s.startTime); }
       if (s.status === 'completed' || s.status === 'failed') { setLoading(false); const h = await artifactService.getTrainHistory(); setHistory(h); }
-    } catch {}
+    } catch { /* ignore poll errors */ }
   }, []);
 
   useEffect(() => {
